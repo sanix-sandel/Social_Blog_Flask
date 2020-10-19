@@ -1,0 +1,30 @@
+<html>
+    <head>
+        {% if title %}
+        <title>{{title}} Social Blog</title>
+        {% else %}
+        <title>Welcome to SocioBlog</title>
+        {% endif %}
+    </head>
+    <body>
+        <div>
+            SocioBlog: <a href="/index">Home</a>
+            <a href="/login">Login</a>
+        </div>
+        <hr>
+        {% with messages=get_flashed_messages() %}
+
+        {% if message %}
+
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        
+
+        {%block content%}{% endblock %}
+    </body>
+</html>
