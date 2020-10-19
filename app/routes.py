@@ -18,16 +18,16 @@ from .forms import*
 
 @app.route('/')
 @app.route('/index')
-def index():
+def home():
     return render_template('index.html', 
         title='Home')
 
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def loginuser():
 
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
     form=LoginForm()
 
@@ -35,13 +35,13 @@ def login():
         user=User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
-            return redirect(url_for('login'))
+            return redirect(url_for('loginuser'))
         login_user(user, remember=form.remember_me.data)
         #flash(f"Login requested for user {form.username.data} {form.remember_me.data}")
         next_page=request.args.get('next')
-        if not next_page or url_parse(next_page).netloc!='':
-            next_page=url_for('index')
-        return redirect(url_for(next_page))
+        if not next_page or not next_page.startswith('/'):
+            next_page=url_for('home')
+        return redirect(next_page)
 
     return render_template(
         'login.html',
@@ -53,14 +53,14 @@ def login():
 
 
 @app.route('/logout')
-def logout():
+def logoutuser():
     logout_user()
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
-def register():
+def registeruser():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))    
+        return redirect(url_for('home'))    
     form=RegistrationForm()
     if form.validate_on_submit():
         user=User(username=form.username.data, email=form.email.data)
@@ -68,5 +68,16 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user !')
-        return redirect(url_for('login'))
+        return redirect(url_for('loginuser'))
     return render_template('register.html', title='Register', form=form)        
+
+
+@app.route('/user/<username>') 
+@login_required
+def userprofile(username):
+    user=User.query.filter_by(username=username).first_or_404()
+    posts=[
+        {'author':user, 'body':'Test post #1'},
+        {'author':user, 'body':'Test post #2'}
+    ]  
+    return render_template('user.html', user=user, posts=posts) 
