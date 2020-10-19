@@ -9,7 +9,7 @@
     <body>
         <div>
             SocioBlog: <a href="{{url_for('index')}}">Home</a>
-            {% if current.is_anonymous %}
+            {% if current_user.is_anonymous %}
             <a href="{{url_for('login')}}">Login</a>
             {% else %}
             <a href="{{url_for('logout')}}">Login</a>
