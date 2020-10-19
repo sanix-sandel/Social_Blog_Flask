@@ -1,5 +1,7 @@
 from flask import render_template, redirect, flash
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, 
+                        login_user, logout_user,
+                        login_required
 
 from app import app
 
@@ -11,6 +13,7 @@ from .forms import LoginForm
 
 @app.route('/')
 @app.route('/index')
+@login_required
 def index():
     user={'username':'Sanix'}
     posts=[
@@ -43,7 +46,10 @@ def login():
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         #flash(f"Login requested for user {form.username.data} {form.remember_me.data}")
-        return redirect(url_for('/index'))
+        next_page=request.args.get('next')
+        if not next_page or url_parse(next_page).netloc!='':
+            next_page=url_for('index')
+        return redirect(url_for(next_page))
 
     return render_template(
         'login.html',
