@@ -41,3 +41,17 @@ def update_post(id):
     return jsonify({'message':'post updated'})    
 
 
+@app.route('/api/users', methods=['GET'])
+def users():
+    users=User.query.all()
+    return jsonify({'users':[user.to_json() for user in users]})
+
+@app.route('/api/users/<int:id>', methods=['GET'])
+def user_detail(id):
+    user=User.query.get_or_404(id)
+    return jsonify({'user':user.to_json()})
+
+@app.route('/api/users/<int:id>/posts', methods=['GET'])
+def user_posts(id):
+    user=User.query.get_or_404(id)
+    return jsonify({'user':user.json_with_posts()})    

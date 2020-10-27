@@ -60,7 +60,30 @@ class User(UserMixin, db.Model):
                 followers.c.follower_id==self.id)
         own=Post.query.filter_by(user_id=self.id)
         return followed.union(own).order_by(Post.timestamp.desc())    
-        
+
+
+    def to_json(self):
+        json_user={
+            'id':self.id,
+            'username':self.username,
+            'email':self.email,
+            'about':self.about_me,
+            'last_seen':self.last_seen
+            
+        }    
+        return json_user
+
+    def json_with_posts(self):
+        json_user={
+            'id':self.id,
+            'username':self.username,
+            'email':self.email,
+            'about':self.about_me,
+            'last_seen':self.last_seen,
+            'posts':[post.to_json_for_user() for post in self.posts]
+            
+        }    
+        return json_user         
 
     def __repr__(self):
         return f'User {self.username}'
@@ -84,6 +107,18 @@ class Post(db.Model):
             
         }
         return json_post
+
+    def to_json_for_user(self):
+        json_post={
+            'id':self.id,
+            'title':self.title,
+            'body':self.body,
+            'timestamp':self.timestamp,
+           
+            
+        }
+        return json_post
+
 
     @staticmethod
     def from_json(json_post):
