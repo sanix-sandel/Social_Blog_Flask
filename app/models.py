@@ -73,8 +73,29 @@ class Post(db.Model):
     timestamp=db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id=db.Column(db.Integer, db.ForeignKey('user.id'))
 
+
+    def to_json(self):
+        json_post={
+            'id':self.id,
+            'title':self.title,
+            'body':self.body,
+            'timestamp':self.timestamp,
+            'user_id':self.user_id
+            
+        }
+        return json_post
+
+    @staticmethod
+    def from_json(json_post):
+        title=json_post.get('title')
+        body=json_post.get('body')
+        if body is None or body=='':
+            raise ValidationError('post does not have a body')
+        return Post(title=title, body=body)
+
+
     def __repr__(self):
-        return f'<Post {self.title}'        
+        return f'<Post {self.title}>'        
 
 
 @login.user_loader        

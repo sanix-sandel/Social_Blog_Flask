@@ -70,7 +70,7 @@ def loginuser():
 @app.route('/logout')
 def logoutuser():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('loginuser'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def registeruser():
